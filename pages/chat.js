@@ -1,6 +1,5 @@
-
 import OpenAI from 'openai';
-import { kurz_content } from '../../lib/kurz_data.js';
+import { kurz_content } from '../lib/kurz_data.js';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -13,9 +12,13 @@ export default async function handler(req, res) {
 
   const { messages, topic } = req.body;
 
+  if (!messages || !Array.isArray(messages)) {
+    return res.status(400).json({ reply: 'Chybí zprávy nebo nejsou ve správném formátu.' });
+  }
+
   const systemPrompt = `
 Jsi "Mindset Coach" – digitální průvodce kurzem. Pomáháš studentům rozvíjet dovednosti kouče, emoční inteligenci, růstový mindset a sebereflexi. Kontext tématu:
-${kurz_content[topic]?.context || ''}
+${kurz_content[topic]?.context || '⚠️ Kontext k tomuto tématu nebyl nalezen.'}
   `;
 
   try {
